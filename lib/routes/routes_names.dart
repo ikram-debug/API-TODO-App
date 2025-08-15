@@ -7,4 +7,5 @@ class RoutesNames {
   static const String homescreen = '/homescreen';
   static const String postscreen = '/postscreen';
   static const String editscreen = '/editscreen';
+  static const String forgotpassword = '/forgotpassword';
 }

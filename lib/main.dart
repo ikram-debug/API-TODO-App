@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/Core/constant/app_sizes.dart';
 import 'package:todo_app/routes/routes.dart';
 import 'package:todo_app/routes/routes_names.dart';
 
@@ -11,6 +12,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppSizes.init(context);
     return MaterialApp(
       title: 'Todo App',
       theme: ThemeData(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/View/Edit_Screen_View/Edit_Screen.dart';
+import 'package:todo_app/View/Forgot_Password_View/Forgot_Password.dart';
 import 'package:todo_app/View/Home_Screen_View/Home_Screen.dart';
 import 'package:todo_app/View/Login_Screen_View/Login_Screen.dart';
 import 'package:todo_app/View/Post_Screen_View/Post_Screen.dart';
@@ -34,6 +35,9 @@ class AppRoutes {
       case RoutesNames.editscreen:
         return fadeRoute(EditScreen());
 
+      case RoutesNames.forgotpassword:
+        return fadeRoute(ForgotPassword());
+
       default:
         return MaterialPageRoute(
           builder: (BuildContext context) =>
@@ -58,6 +62,7 @@ Route<dynamic> fadeRoute(Widget page) {
         child: child,
       );
     },
-    transitionDuration: const Duration(milliseconds: 1),
+    transitionDuration:  Duration(milliseconds: 1),
+    reverseTransitionDuration: Duration(milliseconds: 1),
   );
 }
