@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/Core/constant/app_colors.dart';
 import 'package:todo_app/Core/constant/app_sizes.dart';
-
-import '../constant/app_paddings.dart';
 import '../constant/text_sizes.dart';
 
 class CustomRoundbutton extends StatelessWidget {
 
   final String title;
   final VoidCallback onpressed;
+  final bool? loading;
 
   const CustomRoundbutton({super.key,
   required this.title,
     required this.onpressed,
+    this.loading,
   });
 
   @override
@@ -33,9 +33,15 @@ class CustomRoundbutton extends StatelessWidget {
         ),
         elevation: 2,
       ),
-      child: Text(
-        title,
-        style: AppTextStyle.btext,
+      child: Center(
+        child: loading == true ?
+        CircularProgressIndicator(
+          color: kwhitecolor,
+        ):
+        Text(
+          title,
+          style: AppTextStyle.btext,
+        ),
       ),
     );
   }

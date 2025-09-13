@@ -9,10 +9,12 @@ class CustomRoundbutton2 extends StatelessWidget {
 
   final String title;
   final VoidCallback onpressed;
+  final bool? loading;
 
   const CustomRoundbutton2({super.key,
     required this.title,
     required this.onpressed,
+    this.loading,
   });
 
   @override
@@ -31,9 +33,15 @@ class CustomRoundbutton2 extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
         ),
       ),
-      child: Text(
-        title,
-        style: AppTextStyle.btext2,
+      child:Center(
+        child: loading == true ?
+        CircularProgressIndicator(
+          color: kredcolor,
+        ):
+        Text(
+          title,
+          style: AppTextStyle.btext2,
+        ),
       ),
     );
   }

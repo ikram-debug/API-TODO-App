@@ -9,9 +9,11 @@ class CustomListTile extends StatelessWidget {
   final String text;
   final VoidCallback onTap;
   final double sizebox;
+  final bool? loading;
 
   const CustomListTile({
     Key? key,
+    this.loading,
     required this.icon,
     required this.text,
     required this.onTap,
@@ -27,9 +29,13 @@ class CustomListTile extends StatelessWidget {
         color: kwhitecolor
       ),
       minLeadingWidth:AppSizes.wp(10),
-      title: Text(
-        text,
-        style: AppTextStyle.drawer,
+      title: Center(
+        child: loading == true ? CircularProgressIndicator(
+          color: kwhitecolor,
+        ) : Text(
+          text,
+          style: AppTextStyle.drawer,
+        ),
       ),
       onTap: onTap,
     );

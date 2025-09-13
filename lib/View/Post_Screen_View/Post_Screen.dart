@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/Core/constant/AppGaps.dart';
 import 'package:todo_app/Core/constant/app_paddings.dart';
 import 'package:todo_app/Core/constant/app_sizes.dart';
 import 'package:todo_app/Core/widgets/Custom_PostTextField.dart';
 import 'package:todo_app/Core/widgets/Custom_RoundButton2.dart';
+import 'package:todo_app/ViewModel/todo_viewmodel.dart';
 import 'package:todo_app/routes/routes_names.dart';
 
 import '../../Core/constant/app_colors.dart';
@@ -34,6 +36,7 @@ class _PostScreenState extends State<PostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final todoVM = Provider.of<todoprovider>(context);
     AppSizes.init(context);
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -56,7 +59,7 @@ class _PostScreenState extends State<PostScreen> {
               ),
             ),
             Padding(
-                padding: AppPaddings.symmetric(3, 2),
+                padding: AppPaddings.symmetric(5, 3),
               child: Form(
                 key: _formkey,
                 child: Column(
@@ -102,11 +105,13 @@ class _PostScreenState extends State<PostScreen> {
                     AppGaps.h20(),
                     CustomRoundbutton2(
                         title: 'Add',
+                        loading: todoVM.postloading,
                         onpressed: () {
-                          Navigator.pushNamedAndRemoveUntil(context,
-                              RoutesNames.homescreen,
-                              (routes) => false
-                          );
+                          Map<String, dynamic> data = {
+                            "Title" : titlecontroler.text.trim(),
+                            "Discriptaion" : discriptioncontroler.text.trim(),
+                          };
+                          todoVM.posttodo(data, context);
                         }
                     ),
                   ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/Core/constant/AppGaps.dart';
 import 'package:todo_app/Core/constant/app_colors.dart';
 import 'package:todo_app/Core/constant/app_paddings.dart';
@@ -8,6 +9,7 @@ import 'package:todo_app/Core/widgets/CustomValidator.dart';
 import 'package:todo_app/Core/widgets/custom_Inkwellbutton.dart';
 import 'package:todo_app/Core/widgets/custom_RoundButton.dart';
 import 'package:todo_app/Core/widgets/custom_textfield.dart';
+import 'package:todo_app/ViewModel/auth_viewmodel.dart';
 import 'package:todo_app/routes/routes_names.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -93,16 +95,20 @@ class _SignupScreenState extends State<SignupScreen> {
                               validator: passwordValidator(),
                             ),
                             AppGaps.h10(),
-                            CustomRoundbutton(
+                            Consumer<AuthViewmodel>(builder: (context, auth, _){
+                              return CustomRoundbutton(
                                 title: 'SignUP',
+                                loading: auth.signuploading,
                                 onpressed: () {if(_formkey.currentState!.validate()){
-                                  Navigator.pushNamedAndRemoveUntil(context,
-                                      RoutesNames.homescreen,
-                                          (routes) => false
+                                  auth.signupUser(
+                                      emialcontroler.text.trim(),
+                                      passwordcontroler.text.trim(),
+                                      context
                                   );
                                 }
                                 },
-                            ),
+                              );
+                            }),
                             AppGaps.h2(),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,

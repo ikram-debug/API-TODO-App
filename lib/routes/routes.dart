@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/View/Edit_Screen_View/Edit_Screen.dart';
-import 'package:todo_app/View/Forgot_Password_View/Forgot_Password.dart';
 import 'package:todo_app/View/Home_Screen_View/Home_Screen.dart';
-import 'package:todo_app/View/Login_Screen_View/Login_Screen.dart';
 import 'package:todo_app/View/Post_Screen_View/Post_Screen.dart';
-import 'package:todo_app/View/SignUp_Screen_View/SignUp_Screen.dart';
 import 'package:todo_app/View/Splash_Screen_View/Splash_Screen.dart';
-import 'package:todo_app/View/WellCome_Screen_View/WellCome_Screen.dart';
+import 'package:todo_app/View/auth/Auth_Gate/auth_gate.dart';
 import 'package:todo_app/routes/routes_names.dart';
+import '../View/auth/Forgot_Password_View/Forgot_Password.dart';
+import '../View/auth/Login_Screen_View/Login_Screen.dart';
+import '../View/auth/SignUp_Screen_View/SignUp_Screen.dart';
+import '../View/auth/WellCome_Screen_View/WellCome_Screen.dart';
 
 class AppRoutes {
 
@@ -17,7 +18,7 @@ class AppRoutes {
       case RoutesNames.SplashScreen:
         return fadeRoute(SplashScreen());
 
-      case RoutesNames.wellcomde:
+      case RoutesNames.wellcome:
         return fadeRoute(WellcomeScreen());
 
       case RoutesNames.loginscreen:
@@ -33,10 +34,13 @@ class AppRoutes {
         return fadeRoute(PostScreen());
 
       case RoutesNames.editscreen:
-        return fadeRoute(EditScreen());
+        return fadeRoute(EditScreen(arguments: settings.arguments));
 
       case RoutesNames.forgotpassword:
         return fadeRoute(ForgotPassword());
+
+      case RoutesNames.authgate:
+        return fadeRoute(AuthGate());
 
       default:
         return MaterialPageRoute(

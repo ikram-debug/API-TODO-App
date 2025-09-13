@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/Core/constant/AppGaps.dart';
 import 'package:todo_app/Core/constant/app_colors.dart';
 import 'package:todo_app/Core/constant/app_paddings.dart';
@@ -9,7 +11,12 @@ import 'package:todo_app/Core/widgets/custom_Inkwellbutton.dart';
 import 'package:todo_app/Core/widgets/custom_textfield.dart';
 import 'package:todo_app/View/Home_Screen_View/Widget/Custom_FloatingButton.dart';
 import 'package:todo_app/View/Home_Screen_View/Widget/Custom_ListTile.dart';
+import 'package:todo_app/ViewModel/todo_viewmodel.dart';
 import 'package:todo_app/routes/routes_names.dart';
+import 'package:todo_app/ViewModel/auth_viewmodel.dart';
+
+
+import '../../Core/utils/utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,10 +27,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+
+  late String _id;
+
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.microtask(() {
+      Provider.of<todoprovider>(context, listen: false).gettood(context);
+    });
+  }
+
   final _formkey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    final todoVM = Provider.of<todoprovider>(context);
+    final authvm = Provider.of<AuthViewmodel>(context);
     AppSizes.init(context);
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -71,17 +94,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   sizebox: AppSizes.wp(5),
               ),
-              CustomListTile(
-                icon: Icons.logout,
-                text: 'Logout',
-                onTap: () {
-                  Navigator.pushNamedAndRemoveUntil(context,
-                      RoutesNames.wellcomde,
-                          (routes)=> false
-                  );
-                },
-                sizebox: AppSizes.wp(5),
-              ),
+              Consumer<AuthViewmodel>(builder: (context,auth, _){
+                return  CustomListTile(
+                  icon: Icons.logout,
+                  text: 'Logout',
+                  loading: auth.logoutloading,
+                  onTap: () {
+                    authvm.logoutuser(context);
+                  },
+                  sizebox: AppSizes.wp(5),
+                );
+              })
             ],
           ),
         ),
@@ -117,28 +140,34 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   AppGaps.h2(),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: 20,
+                    child: todoVM.getloading ?
+                    Center(
+                      child: CircularProgressIndicator(
+                        color: kwhitecolor,
+                      ),
+                    ): ListView.builder(
+                        itemCount: todoVM.todos.length,
                         shrinkWrap: true,
                         itemBuilder: (BuildContext context, i){
-                        return Padding(
-                          padding: AppPaddings.bottom(1),
-                          child: Card(
-                            color: kwhitecolor,
-                            child: Padding(
-                              padding: AppPaddings.all(2),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Flutter Task',
-                                        style: AppTextStyle.Title,
-                                      ),
-                                      PopupMenuButton(
+                          final todo = todoVM.todos[i];
+                          return Padding(
+                            padding: AppPaddings.bottom(1),
+                            child: Card(
+                              color: kwhitecolor,
+                              child: Padding(
+                                padding: AppPaddings.all(2),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          todo.title ?? 'No Title',
+                                          style: AppTextStyle.Title,
+                                        ),
+                                        PopupMenuButton(
                                           child: Icon(
                                             Icons.more_vert,
                                             size: AppSizes.hp(3),
@@ -174,63 +203,78 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ),
                                           ],
-                                        onSelected: (String value){
+                                          onSelected: (String value){
                                             if(value == 'edit'){
                                               Navigator.pushNamedAndRemoveUntil(context,
                                                   RoutesNames.editscreen,
-                                                  (routes) => true
+                                                  arguments: {
+                                                    'id': todo.id,
+                                                    'title': todo.title,
+                                                    'description': todo.discriptaion
+                                                  },
+                                                      (routes) => true
                                               );
                                             }
-                                            if(value == 'delete'){
+                                            if (value == 'delete') {
                                               showDialog(
-                                                  context: context,
-                                                  builder: (context){
-                                                    return AlertDialog(
-                                                      backgroundColor: kwhitecolor,
-                                                      title:  Text(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Consumer<todoprovider>(
+                                                    builder: (context, todoVM, child) {
+                                                      return AlertDialog(
+                                                        backgroundColor: kwhitecolor,
+                                                        title: Text(
                                                           'Confirm Delete',
-                                                        style: AppTextStyle.TD,
-                                                      ),
-                                                      content: Text(
-                                                          'Are you sure you want to delete this item?',
-                                                        style: AppTextStyle.body,
-                                                      ),
-                                                      actions: [
-                                                        CustomInkwellbutton2(
-                                                            title: 'Cancle',
-                                                            onpress: () {
-                                                              Navigator.pop(context);
-                                                            }
+                                                          style: AppTextStyle.TD,
                                                         ),
-                                                        CustomInkwellbutton(
-                                                          backgroundColor: kredcolor,
-                                                            title: 'Delete',
+                                                        content: Text(
+                                                          'Are you sure you want to delete this item?',
+                                                          style: AppTextStyle.body,
+                                                        ),
+                                                        actions: [
+                                                          CustomInkwellbutton2(
+                                                            title: 'Cancel',
                                                             onpress: () {
                                                               Navigator.pop(context);
-                                                            }
-                                                        )
-                                                      ],
-                                                    );
-                                                  }
+                                                            },
+                                                          ),
+                                                          CustomInkwellbutton(
+                                                            backgroundColor: kredcolor,
+                                                            title: 'Delete',
+                                                            loading: todoVM.deleteloading,
+                                                            onpress: () {
+                                                              if (todo.id != null && todo.id!.isNotEmpty) {
+                                                                todoVM.deletetodo(todo.id!.toString(), context);
+                                                              } else {
+                                                                Utils.flushbar("ID not found for this todo", context);
+                                                              }
+                                                            },
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
                                               );
                                             }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  AppGaps.h1(),
-                                  Text(
-                                    'I want to complate my project in this week\nAnd i am starting new project for my clint that have special for me ',
-                                    style: AppTextStyle.body,
-                                  ),
-                                ],
+
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    AppGaps.h1(),
+                                    Text(
+                                     todo.discriptaion ?? 'No Discription',
+                                      style: AppTextStyle.body,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }
+                          );
+                        }
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

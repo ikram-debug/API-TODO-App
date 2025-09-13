@@ -7,13 +7,15 @@ import '../constant/text_sizes.dart';
 class CustomInkwellbutton2 extends StatelessWidget {
   final String title;
   final VoidCallback onpress;
-  final Color? backgroundColor; // optional
+  final Color? backgroundColor;// optional
+  final bool? loading;
 
   const CustomInkwellbutton2({
     super.key,
     required this.title,
     required this.onpress,
     this.backgroundColor, // optional param
+    this.loading
   });
 
   @override
@@ -27,12 +29,18 @@ class CustomInkwellbutton2 extends StatelessWidget {
           color: backgroundColor ?? Colors.transparent, // default transparent
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Text(
-          title,
-          style: AppTextStyle.btext.copyWith(
-            color: kblackcolor,
-          ),
+        child: Center(
+          child: loading == true ?
+          CircularProgressIndicator(
+            color: kwhitecolor,
+          ):
+          Text(
+             title,
+              style: AppTextStyle.btext.copyWith(
+              color: kblackcolor,
+         ),
         ),
+      ),
       ),
     );
   }

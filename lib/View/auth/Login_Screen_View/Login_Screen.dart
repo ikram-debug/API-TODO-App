@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/Core/constant/AppGaps.dart';
 import 'package:todo_app/Core/constant/app_colors.dart';
 import 'package:todo_app/Core/constant/app_paddings.dart';
 import 'package:todo_app/Core/constant/app_sizes.dart';
 import 'package:todo_app/Core/widgets/CustomValidator.dart';
 import 'package:todo_app/Core/widgets/Custom_RoundButton2.dart';
+import 'package:todo_app/Core/widgets/Custpm_InkwelButton3.dart';
 import 'package:todo_app/Core/widgets/custom_Inkwellbutton.dart';
 import 'package:todo_app/Core/widgets/custom_RoundButton.dart';
 import 'package:todo_app/Core/widgets/custom_textfield.dart';
+import 'package:todo_app/ViewModel/auth_viewmodel.dart';
 import 'package:todo_app/routes/routes_names.dart';
-
-import '../../Core/constant/text_sizes.dart';
+import '../../../Core/constant/text_sizes.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -40,7 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-
         body: Stack(
           children: [
             SizedBox.expand(
@@ -89,6 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           AppGaps.h2(),
                           CustomTextField(
+                            controller: passwordcontroler,
                             hintText: 'Enter your password',
                             prefixIcon: Icons.lock,
                             isEyeTrue: true,
@@ -97,28 +99,32 @@ class _LoginScreenState extends State<LoginScreen> {
                           AppGaps.h2(),
                           Align(
                             alignment: Alignment.bottomRight,
-                            child: CustomInkwellbutton(
-                                title: 'Forgot Password?',
-                                onpress: () {
+                            child: CustpmInkwelbutton3(
+                                title: 'Forget Password?',
+                                onpressed:() {
                                   Navigator.pushNamedAndRemoveUntil(context,
                                       RoutesNames.forgotpassword,
-                                          (routes) => true
+                                      (rputes) => true,
                                   );
                                 }
                             ),
                           ),
                           AppGaps.h5(),
-                          CustomRoundbutton(
-                            title: 'Login',
-                            onpressed: () { if(_formkey.currentState!.validate())
-                            {
-                              Navigator.pushNamedAndRemoveUntil(context,
-                                  RoutesNames.homescreen,
-                                      (routes) => false
-                              );
-                            }
-                            },
-                          ),
+                         Consumer<AuthViewmodel>(builder: (context, auth, _){
+                           return CustomRoundbutton(
+                             loading: auth.loginloading,
+                             title: 'Login',
+                             onpressed: () { if(_formkey.currentState!.validate())
+                             {
+                               auth.loginuser(
+                               emailcontroler.text.trim(),
+                               passwordcontroler.text.trim(),
+                                   context
+                               );
+                             }
+                             },
+                           );
+                         }),
                           AppGaps.h2(),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
